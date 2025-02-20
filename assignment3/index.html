@@ -97,6 +97,9 @@
         let history = document.getElementById("history");
 
         let startOver = document.getElementById("startOver");
+        startOver.onclick = function(){
+            resetGame();
+        }
 
         //grass onclick
         grassClicked.forEach(grass =>{
@@ -126,11 +129,6 @@
                         //pokemon image
                         grass.src = foundPokemon.image;
                         grass.style.display = "inline-block";
-                        
-                        //track pokemon hisotry
-                        let newEntry = document.createElement("p");
-                        newEntry.innerText = foundPokemon.name;
-                        history.prepend(newEntry);
 
                     } else if (outcome === 1){
                         //pokeballs
@@ -147,6 +145,10 @@
                         //nothing
                         document.getElementById("result").innerText = "Nothing here!";
                     }
+                    //track result hisotry
+                    let newEntry = document.createElement("p");
+                        newEntry.innerText = result.innerText;
+                        history.prepend(newEntry)
                     
                 }
                 if (ballCount == 0 && game){ //game is over --> display message
@@ -180,6 +182,19 @@
                 grass.src ="images/grass.png";
                 grass.style.display = "inline-block";
             });
+        }
+
+        function resetGame(){
+            let ballCount= 5;
+            let pokemonCaught = 0;
+            let round = true;
+            let game = true;
+            resetRound();
+
+            history.innerText = "";
+            document.getElementById("ballsLeft").innerText = ballCount;
+            document.getElementById("pokemonCaught").innerText = pokemonCaught;
+            
         }
     </script>
 </body>
