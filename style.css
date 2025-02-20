@@ -19,7 +19,7 @@ footer {
     background-color: #333;
     color: white;
     padding: 10px;
-    position: absolute;
+    position: relative;
     bottom: 0;
     width: 100%;
     margin-top: 20px;
@@ -30,6 +30,15 @@ footer {
     gap: 20px;
     padding: 20px;
     justify-content: center;
+}
+
+.assignments a{
+    text-decoration:none;
+    color:inherit;
+}
+
+.assignments img{
+    display:inline-block;
 }
 
 .assignment {
@@ -54,7 +63,7 @@ footer {
 /*l arge screens (>= 961px) - 1 row with 9 icons */
 @media (min-width: 961px) {
     .assignments {
-        grid-template-columns: repeat(10, 1fr);
+        grid-template-columns: repeat(9, 1fr);
     }
 }
 
