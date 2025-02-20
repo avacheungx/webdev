@@ -57,6 +57,10 @@
         <p></p><span id = "result"></span> </p>
         <p>Pokeballs Left: <span id = "ballsLeft"></span> </p>
         <p>Pokemon Caught: <span id = "pokemonCaught"></span> </p>
+        <button id = "playAgain">Play Again</button>
+        <button id = "startOver">Start Over</button>
+        <h3>History</h3>
+        <div id = "history"></div>
     </div>
 
     <script>
@@ -82,6 +86,18 @@
         document.getElementById("pokemonCaught").innerText = pokemonCaught;
         document.getElementById("result").innerText = "Your progress so far ...";
 
+        //button DOM
+        let playButton = document.getElementById("playAgain");
+        playButton.style.display = "none"; //hide
+
+        playButton.onclick = function(){
+            resetRound();
+        }
+        
+        let history = document.getElementById("history");
+
+        let startOver = document.getElementById("startOver");
+
         //grass onclick
         grassClicked.forEach(grass =>{
             grass.onclick = function() {
@@ -90,6 +106,9 @@
                     //decrement all count
                     ballCount --;
                     document.getElementById("ballsLeft").innerText = ballCount;
+
+                    //display play again button
+                    playButton.style.display = "inline-block";
 
                     //remove grass
                     grass.style.display = 'none';
@@ -108,7 +127,11 @@
                         grass.src = foundPokemon.image;
                         grass.style.display = "inline-block";
                         
-                        
+                        //track pokemon hisotry
+                        let newEntry = document.createElement("p");
+                        newEntry.innerText = foundPokemon.name;
+                        history.prepend(newEntry);
+
                     } else if (outcome === 1){
                         //pokeballs
                         ballCount += 2;
@@ -119,33 +142,26 @@
                         grass.src = "images/pokeballs.png";
                         grass.style.display = "inline-block";
 
+
                     } else if (outcome === 2){
                         //nothing
                         document.getElementById("result").innerText = "Nothing here!";
                     }
-                    //display play again button
-                    let button = document.createElement("button");
-                    button.innerText = "Play Again";
-                    button.id = "playbutton"
-                    button.onclick = resetRound;
-                    document.getElementById("info").appendChild(button);
+                    
                 }
                 if (ballCount == 0 && game){ //game is over --> display message
                     game = false;
                     let message = document.createElement("div");
                     message.innerText = "Game Over!";
-                    message.classList.add = "gameOverMessage";
+                    message.classList.add = ("gameOverMessage");
                     document.getElementById("info").appendChild(message);
                     message.style.color = "red";
                     message.style.fontSize = "28px";
-                    message.style.postion = "absolute";
+                    message.style.position = "relative";
                     message.style.textAlign = "center";
                     
                     //remove play again button
-                    let button = document.getElementById("playbutton");
-                    if (button) {
-                        button.remove();
-                    }
+                    playButton.style.display = "none";
                 }
             }
 
@@ -157,10 +173,7 @@
             document.getElementById("pokemonCaught").innerText = pokemonCaught;
 
             //remove play again button
-            let button = document.getElementById("playbutton");
-            if (button) {
-                button.remove();
-            }
+            playButton.style.display = "none";
 
             //add grass
             grassClicked.forEach(grass =>{
