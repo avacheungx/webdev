@@ -8,18 +8,33 @@
         body {
             display:flex;
             justify-content: center;
-            flex-direction:row;
+            flex-direction:column;
             align-items: flex-start;
             font-family:Arial, Helvetica, sans-serif;
+            max-width:max-content;
         }
 
         #container{
-            position:relative;
-            display: inline-block;
+            display:flex;
+            justify-content: center;
+            align-items: flex-start;
         }
 
         #info{
             margin-left: 10px;
+        }
+
+        #game{
+            display:flex;
+            flex-direction:column;
+            position:relative;
+        }
+
+        #gameOver{
+            font-size:50px;
+            color:red;
+            position:absolute;
+            text-align:center;
         }
 
         #grass-container{
@@ -36,31 +51,99 @@
             font-size:28px;
         }
 
+        #pokedex{
+            display:flex;
+            flex-direction:row;
+            justify-content: space-between;
+            width:30%;
+            max-width: 800px;
+            position:fixed;
+            top:600px;
+            
+        }
+
+        .bar{
+            height:20px;
+            line-height: 20px;
+            width: 0px;
+        }
+
+
+        #pikaGram{
+            background-color: yellow;
+        }
+
+        #bulbGram{
+            background-color:green;
+        }
+
+        #charGram{
+            background-color: red;
+        }
+
+        #eeveeGram{
+            background-color: darkred;
+        }
+
+        #squirtGram{
+            background-color: blue;
+        }
+
 
     </style>
 </head>
 <body>
     <div id = container> 
-        <img src="images/environment_forestbackground.png" alt="backgound" width = "800">
-        <div id = grass-container>
-            <img id = "grass1" class = "grass" src = "images/grass.png" alt = "grass">
-            <img id = "grass2" class = "grass" src = "images/grass.png" alt = "grass">
-            <img id = "grass3" class = "grass" src = "images/grass.png" alt = "grass">
+        <div id = game>
+            <img src="images/environment_forestbackground.png" alt="backgound" width = "800">
+            <div id = grass-container>
+                <img id = "grass1" class = "grass" src = "images/grass.png" alt = "grass">
+                <img id = "grass2" class = "grass" src = "images/grass.png" alt = "grass">
+                <img id = "grass3" class = "grass" src = "images/grass.png" alt = "grass">
+            </div>
+        </div>
+        <div id = info>
+            <h1>Gotta Catch 'em All!</h1>
+            <p>Your goal in this game is to earn as many Pokeballs as possible while catching a variety of Pokemon along the way.</p>
+            <p>To play simply click on one of the three grass clumps in the forest. Behind one of those grass clumps is a Pokemon that can be caught. Behind
+                another grass clump are two free Pokeballs that you can use to try again, and behind the last grass clump is nothing.</p>
+            <p>Note that each time you pick a grass clump you will be using one of your Pokeballs, and when you run out the game will be over!</p>
+            <p></p><span id = "result"></span> </p>
+            <p>Pokeballs Left: <span id = "ballsLeft"></span> </p>
+            <p>Pokemon Caught: <span id = "pokemonCaught"></span> </p>
+            <button id = "playAgain">Play Again</button>
+            <button id = "startOver">Start Over</button>
+            <h3 id = "gameOver">Game Over</h3>
+            <h3>History</h3>
+            <div id = "history"></div>
         </div>
     </div>
-    <div id = info>
-        <h1>Gotta Catch 'em All!</h1>
-        <p>Your goal in this game is to earn as many Pokeballs as possible while catching a variety of Pokemon along the way.</p>
-        <p>To play simply click on one of the three grass clumps in the forest. Behind one of those grass clumps is a Pokemon that can be caught. Behind
-            another grass clump are two free Pokeballs that you can use to try again, and behind the last grass clump is nothing.</p>
-        <p>Note that each time you pick a grass clump you will be using one of your Pokeballs, and when you run out the game will be over!</p>
-        <p></p><span id = "result"></span> </p>
-        <p>Pokeballs Left: <span id = "ballsLeft"></span> </p>
-        <p>Pokemon Caught: <span id = "pokemonCaught"></span> </p>
-        <button id = "playAgain">Play Again</button>
-        <button id = "startOver">Start Over</button>
-        <h3>History</h3>
-        <div id = "history"></div>
+
+    <div id = "pokedex">
+        <div id = "pokeType">
+            <h4>Pokemon</h4>
+            <p>Pikachu</p>
+            <p>Bulbasaur</p>
+            <p>Charmander</p>
+            <p>Eevee</p>
+            <p>Squirtle</p>
+        </div>
+        <div id = "count">
+            <h4>Count</h4>
+            <p id = pikaCount></p>
+            <p id = bulbCount></p>
+            <p id = charCount></p>
+            <p id = eeveeCount></p>
+            <p id = squirtCount></p>
+        </div>
+        <div id="Histogram">
+            <h4>Histogram</h4>
+            <div id="pikaGram" class="bar">&nbsp;</div>
+            <div id="bulbGram" class="bar">&nbsp;</div>
+            <div id="charGram" class="bar">&nbsp;</div>
+            <div id="eeveeGram" class="bar">&nbsp;</div>
+            <div id="squirtGram" class="bar">&nbsp;</div>
+        </div>
     </div>
 
     <script>
@@ -101,6 +184,42 @@
             resetGame();
         }
 
+        let gameOver = document.getElementById("gameOver");
+        gameOver.style.display = "none";
+
+        //pokedex DOM count
+        const pikaCountElem = document.getElementById("pikaCount");
+        const bulbCountElem = document.getElementById("bulbCount");
+        const charCountElem = document.getElementById("charCount");
+        const eeveeCountElem = document.getElementById("eeveeCount");
+        const squirtCountElem = document.getElementById("squirtCount");
+
+        //pokemon tracker variables
+        let pikachu = 0;
+        let bulbasaur= 0;
+        let charmander = 0;
+        let eevee = 0;
+        let squirtle = 0;
+
+        //update pokdex
+        function updatePokedexCount() {
+            pikaCountElem.innerText = pikachu;
+            bulbCountElem.innerText = bulbasaur;
+            charCountElem.innerText = charmander;
+            eeveeCountElem.innerText = eevee;
+            squirtCountElem.innerText = squirtle;
+        }
+
+        //update histogram
+        function updateHistogram() {
+            const scaleFactor = 20; // Adjust this value to control the width scaling
+            document.getElementById("pikaGram").style.width = (pikachu * scaleFactor) + "px";
+            document.getElementById("bulbGram").style.width = (bulbasaur * scaleFactor) + "px";
+            document.getElementById("charGram").style.width = (charmander * scaleFactor) + "px";
+            document.getElementById("eeveeGram").style.width = (eevee * scaleFactor) + "px";
+            document.getElementById("squirtGram").style.width = (squirtle * scaleFactor) + "px";
+        }
+
         //grass onclick
         grassClicked.forEach(grass =>{
             grass.onclick = function() {
@@ -130,6 +249,27 @@
                         grass.src = foundPokemon.image;
                         grass.style.display = "inline-block";
 
+                        //pokemon tracker
+                        switch(foundPokemon.name){
+                            case "Pikachu":
+                                pikachu ++;
+                                break;
+                            case "Bulbasaur":
+                                bulbasaur ++;
+                                break;
+                            case "Charmander":
+                                charmander ++;
+                                break;
+                            case "Eevee":
+                                eevee ++;
+                                break;
+                            case "Squirtle":
+                                squirtle ++;
+                                break;
+                        }
+                        updatePokedexCount();
+                        updateHistogram();
+                        
                     } else if (outcome === 1){
                         //pokeballs
                         ballCount += 2;
@@ -147,20 +287,13 @@
                     }
                     //track result hisotry
                     let newEntry = document.createElement("p");
-                        newEntry.innerText = result.innerText;
+                        newEntry.innerText = document.getElementById("result").innerText;
                         history.prepend(newEntry)
                     
                 }
                 if (ballCount == 0 && game){ //game is over --> display message
                     game = false;
-                    let message = document.createElement("div");
-                    message.innerText = "Game Over!";
-                    message.classList.add = ("gameOverMessage");
-                    document.getElementById("info").appendChild(message);
-                    message.style.color = "red";
-                    message.style.fontSize = "28px";
-                    message.style.position = "relative";
-                    message.style.textAlign = "center";
+                    gameOver.style.display = "inline-block";
                     
                     //remove play again button
                     playButton.style.display = "none";
@@ -169,7 +302,7 @@
 
         });
         function resetRound(){     
-            round = true;       
+            round = true;
             //reset display
             document.getElementById("ballsLeft").innerText = ballCount;
             document.getElementById("pokemonCaught").innerText = pokemonCaught;
@@ -185,15 +318,30 @@
         }
 
         function resetGame(){
-            let ballCount= 5;
-            let pokemonCaught = 0;
-            let round = true;
-            let game = true;
-            resetRound();
+            game = true;
+            ballCount= 5;
+            pokemonCaught = 0;
 
+            //reset pokemon
+            pikachu = 0;
+            bulbasaur = 0;
+            charmander = 0;
+            eevee = 0;
+            squirtle = 0;
+
+            //reset histogram
+            document.getElementById("pikaGram").style.width = "0";
+            document.getElementById("bulbGram").style.width = "0";
+            document.getElementById("charGram").style.width = "0";
+            document.getElementById("eeveeGram").style.width = "0";
+            document.getElementById("squirtGram").style.width = "0";
+            updatePokedexCount();
+
+            resetRound();
             history.innerText = "";
+            gameOver.style.display = "none";
+            document.getElementsByClassName("bar").style.display = "none";
             document.getElementById("ballsLeft").innerText = ballCount;
-            document.getElementById("pokemonCaught").innerText = pokemonCaught;
             
         }
     </script>
