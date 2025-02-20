@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Assignment 02</title>
+        <style>
+            #container {
+            border: 5px solid black;
+            width: 800px;
+            height: 600px;
+            position: relative;
+            margin: auto;
+            }
+            #background {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                z-index: 0;
+            }
+            #title {
+                position: absolute;
+                z-index: 1;
+                left: 20px;
+                color:white;
+                font-family: Arial, sans-serif;
+            }
+            #info-container {
+                font-family: Arial, sans-serif;
+                font-size:14px;
+                line-height:20px;
+                position: absolute;
+                z-index: 1;
+                left: 20px;
+                top: 80px;
+                background-color: rgba(204, 204, 204, 0.9);
+                padding: 10px;
+                border-radius: 10px;
+            }
+            #body {
+                position: absolute;
+                z-index: 1;
+                bottom: 0px;
+                right: 0px;
+            }
+            #head {
+                position: absolute;
+                z-index: 1;
+                right: 70px;
+                bottom: 275px;
+            }
+        </style>
+
+    </head>
+    <body>
+        <script>
+            const words = ['Awesome', 'Fantastic', 'Fabulous', 'Superb', 'Perfect', 'Brilliant', 'Coming up Roses'];
+            const randWords = words[ parseInt(Math.random() * words.length)];
+
+            const heads = ['images/heads/head1.png','images/heads/head2.png','images/heads/head3.png','images/heads/head4.png','images/heads/head5.png','images/heads/head6.png'];
+            const randHeads = heads[parseInt(Math.random() * heads.length)];
+
+            const bodies = ['images/bodies/body1.png','images/bodies/body2.png','images/bodies/body3.png','images/bodies/body4.png','images/bodies/body5.png','images/bodies/body6.png'];
+            const randBodies = bodies[parseInt(Math.random() * bodies.length)];
+
+            // grab the current time as an OBJECT
+            let currentTime = new Date();
+            let hours = currentTime.getHours();
+            let minutes = currentTime.getMinutes().toString().padStart(2, '0');
+            
+            // throw differnet message depending on time of day
+            let greeting;
+
+            if (hours >= 0 && hours < 6) {
+                greeting = "Good Night!";
+            } else if (hours >= 6 && hours < 12) {
+                greeting = "Good Morning!";
+            } else if (hours >= 12 && hours < 18) {
+                greeting = "Good Afternoon!";
+            } else {
+                greeting = "Good Evening!";
+            }
+
+            // am/pm formatting
+            let ampm = hours >= 12 ? "pm" : "am";
+            let displayHours = hours % 12 || 12;
+
+            // change background based on time of day
+            let background;
+            if (hours >= 6 && hours < 12) {
+                background = "images/backgrounds/morning.png";
+            } else if (hours >= 12 && hours < 17) {
+                background = "images/backgrounds/afternoon.png";
+            } else if (hours >= 17 && hours < 20) {
+                background = "images/backgrounds/evening.png";
+            } else if (hours >= 20 || hours < 6) {
+                background = "images/backgrounds/night.png";
+            }
+
+            // prompt user to pick number >= 3 --> make sure input is a number
+            let number;
+            while (true) {
+                number = parseInt(prompt("Please enter a positive number greater than or equal to 3"));
+                if (!isNaN(number) && number >= 3) break;
+            }
+
+            // pick and display 3 lucky numbers between 1 and user prompt --> same number cannot be set twice
+            let luckyNumbers = new Set();
+            while (luckyNumbers.size < 3) {
+                luckyNumbers.add(Math.floor(Math.random() * number) + 1);
+            }
+            let luckyNumbersArray = Array.from(luckyNumbers);
+            let formattedLuckyNumbers = `${luckyNumbersArray.slice(0, -1).join(", ")} and ${luckyNumbersArray.slice(-1)}`;
+
+            // randomize lego mini figure
+            document.write(`<div id="container">
+                <h1 id="title">Everything is ${randWords}!</h1>
+                <div id="info-container">
+                    <div id="time">The current time is ${hours}:${minutes} ${ampm} - ${greeting}</div>
+                    <div id="lucky">Your three lucky numbers today are ${formattedLuckyNumbers}</div>
+                </div>
+                <img id="body" src="${randBodies}">
+                <img id="head" src="${randHeads}">
+                <img id="background" src="${background}">
+            </div>`);
+        </script>
+    </body>
+</html>

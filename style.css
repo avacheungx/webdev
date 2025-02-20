@@ -1,0 +1,73 @@
+body {
+    font-family: "Signika Negative", serif;
+    color:#f4f4f4;
+    font-weight: 400;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background-color: #acd3fc;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    font-size: 24px;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.assignments {
+    display: grid;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+}
+
+.assignment {
+    background-color: rgb(89, 112, 180);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.assignment img {
+    width: 100px;
+    height: 100px;
+}
+
+.assignment:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+/*l arge screens (>= 961px) - 1 row with 9 icons */
+@media (min-width: 961px) {
+    .assignments {
+        grid-template-columns: repeat(10, 1fr);
+    }
+}
+
+/* medium screens (481px - 960px) - 2 rows with 5 icons each */
+@media (min-width: 481px) and (max-width: 960px) {
+    .assignments {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+/* small screens (<= 480px) - 1 column with 10 rows */
+@media (max-width: 480px) {
+    .assignments {
+        grid-template-columns: 1fr;
+    }
+}

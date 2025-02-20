@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment 3</title>
+    <style>
+        body {
+            display:flex;
+            justify-content: center;
+            flex-direction:row;
+            align-items: flex-start;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        #container{
+            position:relative;
+            display: inline-block;
+        }
+
+        #info{
+            margin-left: 10px;
+        }
+
+        #grass-container{
+            position:absolute;
+            display:flex;
+            bottom:5px;
+        }
+
+        .grass:hover{
+            background-color: rgb(234,239,44,0.5);
+        }
+        
+        #result{
+            font-size:28px;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div id = container> 
+        <img src="images/environment_forestbackground.png" alt="backgound" width = "800">
+        <div id = grass-container>
+            <img id = "grass1" class = "grass" src = "images/grass.png" alt = "grass">
+            <img id = "grass2" class = "grass" src = "images/grass.png" alt = "grass">
+            <img id = "grass3" class = "grass" src = "images/grass.png" alt = "grass">
+        </div>
+    </div>
+    <div id = info>
+        <h1>Gotta Catch 'em All!</h1>
+        <p>Your goal in this game is to earn as many Pokeballs as possible while catching a variety of Pokemon along the way.</p>
+        <p>To play simply click on one of the three grass clumps in the forest. Behind one of those grass clumps is a Pokemon that can be caught. Behind
+            another grass clump are two free Pokeballs that you can use to try again, and behind the last grass clump is nothing.</p>
+        <p>Note that each time you pick a grass clump you will be using one of your Pokeballs, and when you run out the game will be over!</p>
+        <p></p><span id = "result"></span> </p>
+        <p>Pokeballs Left: <span id = "ballsLeft"></span> </p>
+        <p>Pokemon Caught: <span id = "pokemonCaught"></span> </p>
+    </div>
+
+    <script>
+        //global variables
+        let ballCount= 5;
+        let pokemonCaught = 0;
+        let round = true;
+        let game = true;
+
+        const grassClicked = document.querySelectorAll(".grass");
+
+        //possible pokemon
+        const pokemon = [
+            {name:'Pikachu', image:'images/pikachu.png'}, 
+            {name:'Bulbasaur', image:'images/bulbasaur.png'},
+            {name:'Charmander', image:'images/charmander.png'},
+            {name:'Eevee', image:'images/eevee.png'},
+            {name:'Squirtle', image:'images/squirtle.png'}
+        ]
+
+        //inital game state
+        document.getElementById("ballsLeft").innerText = ballCount;
+        document.getElementById("pokemonCaught").innerText = pokemonCaught;
+        document.getElementById("result").innerText = "Your progress so far ...";
+
+        //grass onclick
+        grassClicked.forEach(grass =>{
+            grass.onclick = function() {
+                if(ballCount > 0 && round && game){
+                    round = false;
+                    //decrement all count
+                    ballCount --;
+                    document.getElementById("ballsLeft").innerText = ballCount;
+
+                    //remove grass
+                    grass.style.display = 'none';
+
+                    //random outcome
+                    let outcome = Math.floor(Math.random()*3);
+
+                    if (outcome === 0){
+                        //pokemon
+                        let foundPokemon = pokemon[Math.floor(Math.random()*pokemon.length)];
+                        document.getElementById("result").innerText = "You caught a(n) " + foundPokemon.name;
+                        pokemonCaught ++;
+                        document.getElementById("pokemonCaught").innerText = pokemonCaught;
+
+                        //pokemon image
+                        grass.src = foundPokemon.image;
+                        grass.style.display = "inline-block";
+                        
+                        
+                    } else if (outcome === 1){
+                        //pokeballs
+                        ballCount += 2;
+                        document.getElementById("ballsLeft").innerText = ballCount;
+                        document.getElementById("result").innerText = "You found two Pokeballs!";
+
+                        //pokeball image
+                        grass.src = "images/pokeballs.png";
+                        grass.style.display = "inline-block";
+
+                    } else if (outcome === 2){
+                        //nothing
+                        document.getElementById("result").innerText = "Nothing here!";
+                    }
+                    //display play again button
+                    let button = document.createElement("button");
+                    button.innerText = "Play Again";
+                    button.id = "playbutton"
+                    button.onclick = resetRound;
+                    document.getElementById("info").appendChild(button);
+                }
+                if (ballCount == 0 && game){ //game is over --> display message
+                    game = false;
+                    let message = document.createElement("div");
+                    message.innerText = "Game Over!";
+                    message.classList.add = "gameOverMessage";
+                    document.getElementById("info").appendChild(message);
+                    message.style.color = "red";
+                    message.style.fontSize = "28px";
+                    message.style.postion = "absolute";
+                    message.style.textAlign = "center";
+                    
+                    //remove play again button
+                    let button = document.getElementById("playbutton");
+                    if (button) {
+                        button.remove();
+                    }
+                }
+            }
+
+        });
+        function resetRound(){     
+            round = true;       
+            //reset display
+            document.getElementById("ballsLeft").innerText = ballCount;
+            document.getElementById("pokemonCaught").innerText = pokemonCaught;
+
+            //remove play again button
+            let button = document.getElementById("playbutton");
+            if (button) {
+                button.remove();
+            }
+
+            //add grass
+            grassClicked.forEach(grass =>{
+                grass.src ="images/grass.png";
+                grass.style.display = "inline-block";
+            });
+        }
+    </script>
+</body>
+</html>
