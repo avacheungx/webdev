@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment 5</title>
+    <style>
+        body{
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            color:white;
+            background-image: url("images/corkboard.jpg");
+            justify-content: center;
+            text-align: center;
+            align-items:center;
+        }
+        #title{
+            text-shadow: 4px 4px black;
+        }
+
+        #panel{
+            background-color: white;
+            padding:20px;
+            color:black;
+            border-radius:20px;
+            width:400px;
+            text-align: left;
+            margin:auto;
+            line-height:25px;
+        }
+        #panel input {
+            width:390px;;
+        }
+        #category{
+            width:400px;
+
+        }
+
+        #dropdown{
+            position:relative;
+            float:right;
+            top:-50px;
+            margin-right:20px;
+        }
+
+        #addBtn{
+            background-image:url("images/add_button.png");
+            border-radius:30px;
+            padding:25px;
+            position:relative;
+            float:right;
+            border:none;
+            margin-right:20px;
+        }
+
+        #details{
+            background-color: white;
+            padding:20px;
+            color:black;
+            border-radius:20px;
+            width:400px;
+            text-align: left;
+            margin:auto;
+            line-height:25px;
+        }
+        #closeBtn{
+            align-items: center;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1 id = "title">Seasonal To-Do List</h1>
+        <select id = "dropdown">
+            <option value = "all">Show all seasons</option>
+            <option value = "winterOnly">Show only Winter items</option>
+            <option value = "springOnly">Show only Spring items</option>
+            <option value = "summerOnly">Show only Summer items</option>
+            <option value = "fallOnly">Show only Fall items</option>
+        </select>
+    </header>
+
+    <div id = "activitiesContainer">
+        <p>TEMP P EVERYTHING GO HERE</p>
+    </div>
+
+    <div id = "panel">
+        <h1> Add New Item</h1>
+        <span id = "warning"></span>
+        <form>
+            <label for = "title">Title:</label><br>
+            <input type = "text">
+        </form>
+        <label for = "category">Category:</label><br>
+        <select id = "category">
+            <option value = "winter">Winter</option>
+            <option value = "spring">Spring</option>
+            <option value = "summer">Summer</option>
+            <option value = "fall">Fall</option>
+        </select>
+        <form>
+            <label for = "description">Description:</label><br>
+            <input type = "text" name = "description"></input>
+        </form>
+        <button id = "saveBtn">Save</button>
+        <button id = "cancelBtn">Cancel</button>
+    </div>
+
+    <div id = "details">
+        <h1>Detail title</h1>
+        <p id = "season">Season:</p>
+        <p id = "detail"></p>
+        <p id = "creation">Created:</p>
+        <p id = "access">Last Accessed:</p>
+        <button id = "closeBtn">Close</button>
+    </div>
+
+    <button id = "addBtn"></button>
+
+    <script>
+        
+    </script>
+</body>
+</html>
