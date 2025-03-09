@@ -11,7 +11,7 @@
             background-image: url("images/corkboard.jpg");
             justify-content: center;
             text-align: center;
-            align-items:center;
+            align-items: center;
         }
         #title{
             text-shadow: 4px 4px black;
@@ -26,33 +26,34 @@
             text-align: left;
             margin:auto;
             line-height:25px;
+            display:none;
         }
-        #panel input {
-            width:390px;;
-        }
-        #category{
-            width:400px;
+        #description{
+            height:100px;
+            vertical-align: top;
 
+        }
+        #panel textarea, #panel select , #titleInput{
+            width: 100%;
         }
 
         #dropdown{
-            position:relative;
-            float:right;
-            top:-50px;
-            margin-right:20px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
         }
 
         #addBtn{
             background-image:url("images/add_button.png");
             border-radius:30px;
             padding:25px;
-            position:relative;
-            float:right;
+            position:absolute;
             border:none;
-            margin-right:20px;
+            right:20px;
+            bottom: 20px;;
         }
 
-        #details{
+        #info{
             background-color: white;
             padding:20px;
             color:black;
@@ -61,9 +62,19 @@
             text-align: left;
             margin:auto;
             line-height:25px;
+            display:none;
+            position:relative;
         }
         #closeBtn{
-            align-items: center;
+            display:block;
+            margin-left:40%;
+            margin-right:50%;
+        }
+
+        #activities{
+            display:flex;
+            flex-wrap: wrap;
+            flex-direction:row;
         }
 
     </style>
@@ -80,45 +91,226 @@
         </select>
     </header>
 
-    <div id = "activitiesContainer">
-        <p>TEMP P EVERYTHING GO HERE</p>
-    </div>
+    <div id = "activities"></div>
 
     <div id = "panel">
         <h1> Add New Item</h1>
         <span id = "warning"></span>
         <form>
             <label for = "title">Title:</label><br>
-            <input type = "text">
+            <input type = "text" name = "title" id = "titleInput">
         </form>
         <label for = "category">Category:</label><br>
         <select id = "category">
-            <option value = "winter">Winter</option>
-            <option value = "spring">Spring</option>
-            <option value = "summer">Summer</option>
-            <option value = "fall">Fall</option>
+            <option value = "Winter">Winter</option>
+            <option value = "Spring">Spring</option>
+            <option value = "Summer">Summer</option>
+            <option value = "Fall">Fall</option>
         </select>
         <form>
             <label for = "description">Description:</label><br>
-            <input type = "text" name = "description"></input>
+            <textarea type = "text" name = "description" id = "description"></textarea>
         </form>
         <button id = "saveBtn">Save</button>
         <button id = "cancelBtn">Cancel</button>
     </div>
 
-    <div id = "details">
-        <h1>Detail title</h1>
-        <p id = "season">Season:</p>
-        <p id = "detail"></p>
-        <p id = "creation">Created:</p>
-        <p id = "access">Last Accessed:</p>
+    <div id = "info">
+        <h2><span id = "infoTitle"></span></h2>
+        <p><span id = "season"></span></p>
+        <p><span id = "details"></span></p>
+        <p><span id = "creation"></span></p>
+        <p><span id = "access"></span></p>
         <button id = "closeBtn">Close</button>
     </div>
 
     <button id = "addBtn"></button>
 
     <script>
+
+        //DOM element retrieverssss?
+        const addBtn = document.getElementById('addBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const panel = document.getElementById('panel');
+        const info = document.getElementById('info');
+        const activities = document.getElementById('activities');
+        const dropdown = document.getElementById('dropdown');
+        const warning = document.getElementById('warning');
+
+        //forms get
+        const titleInput = document.getElementById('titleInput');
+        const description = document.getElementById('description');
+        const category = document.getElementById('category');
+
         
+        addBtn.onclick = function(){
+            panel.style.display = "inline-block";
+        };
+
+        cancelBtn.onclick = function(){
+            panel.style.display = "none";
+        };
+
+        closeBtn.onclick = function(){
+            info.style.display = "none";
+        };
+
+        //save and create new task
+        saveBtn.onclick = function(){
+            //warning for if any info is missing
+            if(titleInput.value === "" || description.value === ""){
+                warning.style.display = "block";
+                warning.innerText = "Please completely fill out the form";
+                warning.style.backgroundColor = "red";
+                warning.style.color = "white";
+                warning.style.padding = "5px";
+                warning.style.textAlign = "center";
+                warning.style.justifyContent = "center";
+                warning.style.width = "400px";
+                return;
+            } 
+
+            //create new item
+            const activity = document.createElement('div');
+            activity.classList.add('activity');
+            activity.innerText = titleInput.value;
+            activity.style.textAlign = "left";
+            activity.style.padding = "10px";
+            activity.style.color= "black";
+            activity.style.fontSize = "25px";
+            activity.style.position = "relative";
+            activity.style.width = "200px";
+            activity.style.height = "200px";
+            activity.style.margin = "5px";
+            activity.style.boxSizing = "border-box";
+            activity.style.wordWrap = "break-word";
+
+            //background color based on season
+            if(category.value === "Winter"){
+                activity.style.backgroundColor = "lightblue";
+
+            }else if (category.value === "Spring"){
+                activity.style.backgroundColor = "lightgreen";
+
+            }else if (category.value === "Summer"){
+                activity.style.backgroundColor = "orange";
+
+            }else if (category.value === "Fall"){
+                activity.style.backgroundColor = "green";
+            }
+
+            //store activity data
+            const createdTime = new Date();
+            activity.dataset.title = titleInput.value;
+            activity.dataset.category = category.value;
+            activity.dataset.description = description.value;
+            activity.dataset.createdTime = createdTime;
+            activity.dataset.lastAccessed = createdTime;
+
+            //delete button on side
+            const deleteBtn = document.createElement('button');
+            deleteBtn.style.backgroundImage = "url('images/delete_button.png')";
+            deleteBtn.style.borderRadius = "30px";
+            deleteBtn.style.border = "none";
+            deleteBtn.style.width = "20px";
+            deleteBtn.style.height = "20px";
+            deleteBtn.style.position = "absolute";
+            deleteBtn.style.top = "-5px";
+            deleteBtn.style.right = "-5px";
+            deleteBtn.style.display = "none";
+
+            //show delete on hover
+            activity.onmouseover = function(){
+                deleteBtn.style.display = "block";
+            };
+            activity.onmouseout = function() {
+                deleteBtn.style.display = "none";
+            };
+            
+            //actually delete activity on click
+            deleteBtn.onclick = function(event){
+                event.stopPropagation()
+                activities.removeChild(activity);
+            };
+
+            activity.appendChild(deleteBtn);
+
+            //function of info panel
+            activity.onclick = function(){
+                info.style.display = "block";
+                document.querySelector("#info h2").innerText = activity.dataset.title;
+                document.getElementById('details').innerText = activity.dataset.description;
+                document.getElementById('details').style.boxShadow = "10px 5px 5px rgba(0, 0, 0, .2)";
+                document.getElementById('details').style.width = "100%";
+                document.getElementById('details').style.padding = "10px";
+                document.getElementById('details').style.borderSizing = "border-box";
+                document.getElementById('details').style.wordWrap = "break-word";
+                document.getElementById('season').innerText = "Season: " + activity.dataset.category;
+                document.getElementById('creation').innerText = "Created: " + activity.dataset.createdTime;
+                document.getElementById('access').innerText = "Last Accessed: " + new Date();
+        
+                //update access time
+                activity.dataset.lastAccessed = new Date().toLocaleString();
+            };
+
+            activities.appendChild(activity);
+
+            //hide panel after saving
+            clearForm();
+            panel.style.display = "none";
+    
+        };
+
+        //dropdown button functionality
+        dropdown.onchange = function () {
+            const selected = dropdown.value; 
+            const allActivities = document.querySelectorAll('.activity');
+
+            for (let i = 0; i < allActivities.length; i++) {
+                const activity = allActivities[i];
+                const activitySeason = activity.dataset.category;
+
+                // Determine the filter condition
+                if (selected === "all") {
+                    activity.style.display = "block";
+                } else {
+                    let selectedSeason;
+                    switch (selected) {
+                        case "winterOnly":
+                            selectedSeason = "Winter";
+                            break;
+                        case "springOnly":
+                            selectedSeason = "Spring";
+                            break;
+                        case "summerOnly":
+                            selectedSeason = "Summer";
+                            break;
+                        case "fallOnly":
+                            selectedSeason = "Fall";
+                            break;
+                        default:
+                            selectedSeason = ""; 
+                    }
+
+                    // Show or hide activities based on the selected filter
+                    if (activitySeason === selectedSeason) {
+                        activity.style.display = "block"; 
+                    } else {
+                        activity.style.display = "none"; 
+                    }
+                }
+            }
+        };
+
+        //clear form
+        function clearForm() {
+            titleInput.value = "";
+            description.value = "";
+            category.value = "Winter";
+        }
+
     </script>
 </body>
 </html>
