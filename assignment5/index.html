@@ -88,6 +88,8 @@
             <option value = "springOnly">Show only Spring items</option>
             <option value = "summerOnly">Show only Summer items</option>
             <option value = "fallOnly">Show only Fall items</option>
+            <option value="completedOnly">Show only Completed items</option>
+            <option value="uncompletedOnly">Show only Uncompleted items</option>
         </select>
     </header>
 
@@ -147,6 +149,8 @@
         
         addBtn.onclick = function(){
             panel.style.display = "inline-block";
+            dropdown.value = "all";
+            dropdown.onchange();
         };
 
         cancelBtn.onclick = function(){
@@ -208,6 +212,34 @@
             activity.dataset.description = description.value;
             activity.dataset.createdTime = createdTime;
             activity.dataset.lastAccessed = createdTime;
+            activity.dataset.completed = "false";
+
+            //complet button
+            const completeBtn = document.createElement("button");
+            completeBtn.innerText = "✔";
+            completeBtn.style.position = "absolute";
+            completeBtn.style.bottom = "5px";
+            completeBtn.style.right = "5px";
+            completeBtn.style.backgroundColor = "white";
+            completeBtn.style.border = "none";
+            completeBtn.style.padding = "5px";
+            completeBtn.style.fontSize = "16px";
+            completeBtn.style.borderRadius = "5px";
+
+            // Toggle completion state
+            completeBtn.onclick = function (event) {
+                event.stopPropagation();
+                if (activity.dataset.completed === "false") {
+                    activity.dataset.completed = "true";
+                    activity.style.textDecoration = "line-through";
+                    activity.style.opacity = "0.6"; //dim
+                } else {
+                    activity.dataset.completed = "false";
+                    activity.style.textDecoration = "none";
+                    activity.style.opacity = "1";
+                }
+            };
+
 
             //delete button on side
             const deleteBtn = document.createElement('button');
@@ -235,6 +267,7 @@
                 activities.removeChild(activity);
             };
 
+            activity.appendChild(completeBtn);
             activity.appendChild(deleteBtn);
 
             //function of info panel
@@ -271,8 +304,27 @@
             for (let i = 0; i < allActivities.length; i++) {
                 const activity = allActivities[i];
                 const activitySeason = activity.dataset.category;
+                const isCompleted = activity.dataset.completed === "true";
 
                 // Determine the filter condition
+                //by completion
+                if (selected === "completedOnly") {
+                    if (isCompleted) {
+                        activity.style.display = "block";
+                    } else {
+                        activity.style.display = "none";
+                    }
+                    continue;
+                }
+                if (selected === "uncompletedOnly") {
+                    if (isCompleted) {
+                        activity.style.display = "none";
+                    } else {
+                        activity.style.display = "block";
+                    }
+                    continue
+                }
+                //by weather
                 if (selected === "all") {
                     activity.style.display = "block";
                 } else {
