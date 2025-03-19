@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment 6</title>
+
+    <style>
+        body{
+            background-color: black;
+            color:white;
+            font-family:'Courier New', Courier, monospace;
+        }
+        #startScreen{
+            display:flex;
+            flex-direction: column;
+            align-items: center;
+            /* temp */
+            display:none; 
+        }
+
+        #startBtn{
+            font-family:'Courier New', Courier, monospace;
+            background-color: white;
+            border: none;
+            padding:5px;
+        }
+
+        #playScreen{
+            display:flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #gridContainer{
+            display:grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap:10px;
+        }
+
+        .pokeball{
+            width:50px;
+            height:50px;
+        }
+
+        #overScreen{
+            display:flex;
+            flex-direction: column;
+            align-items: center;
+            /* temp */
+            display:none; 
+        }
+
+        #againBtn{
+            font-family:'Courier New', Courier, monospace;
+            font-size:30px;
+            background-color: white;
+            border: none;
+            padding:5px;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- start screen -->
+    <div id = startScreen>
+        <h1 id = "title">Memory Matching Madness!</h1>
+        <h3 id = "description">Play a fast-paced game of "memory" and try and beat your best time!</h3>
+        <button id = "startBtn">Start!</button>
+    </div>
+
+    <div id = "playScreen">
+        <h1 id = readyMsg>Ready, Set, Match!</h1>
+        <p id = "time">Time: <span id = timeCnt></span></p>
+        <!-- pokemball grid container -->
+        <div id = "gridContainer">
+
+        </div>
+    </div>
+
+    <div id = "overScreen">
+        <h1 id = overMsg>Game Over!</h1>
+        <p id = "yourTimeP">Your time: <span id = yourTime></span></p>
+        <p id = "bestTimeP">Best time: <span id = bestTime></span></p>
+        <button id = "againBtn">Play Again!</button>
+    </div>
+
+
+    <script>
+        //media array
+        const assets = ['snorlax.png', 'electrabuzz.png', 'chansey.png', 'oddish.png',
+            'pikachu.png', 'paras.png', 'arcanine.png', 'ponita.png',
+            'venonat.png', 'eggsecute.png', 'machop.png', 'pidgey.png',
+            'psyduck.png', 'tauros.png', 'vulpix.png', 'gloom.png',
+            'krabby.png', 'butterfree.png', 'bulbasaur.png', 'clefairy.png',
+            'koffing.png', 'goldeen.png', 'magikarp.png', 'beedrill.png',
+            'lapras.png', 'meowth.png', 'ekans.png', 'jigglypuff.png',
+            'horsea.png', 'polywog.png', 'sandshrew.png', 'rattata.png',
+            'gengar.png', 'eevee.png', 'bellsprout.png', 'squirtle.png',
+            'seel.png', 'caterpie.png'];
+
+        //DOM elements
+        const startScreen = document.getElementById('startScreen');
+        const startBtn = document.getElementById('startBtn');
+        const gridContainer = document.getElementById('gridContainer');
+        const overScreen = document.getElementById('overScreen');
+        const yourTime = document.getElementById('yourTime');
+        const bestTime = document.getElmentById('bestTime');
+        const againBtn = document.getElementById('againBtn');
+        const timeCnt = document.getElementById('timeCnt');
+
+        let tokems = [];
+        let matches = 0;
+        let timer;
+        let elapsedTime = 0;
+
+        //hide start screen after buttton press
+        startBtn.onclick = function(){
+            startScreen.style.display = "none";
+        }
+
+        //create pokeballs
+        for (let i = 0; i < 4; i++){
+            for(let j =0; j <3; j++){
+                let pokeball = document.createElement('img');
+                pokeball.classList.add('pokeball');
+                pokeball.src = 'media/pokeball.png';
+                gridContainer.appendChild(pokeball);
+            }
+        }
+
+        //random 6 pokemon
+
+
+
+    </script>
+    
+</body>
+</html>
