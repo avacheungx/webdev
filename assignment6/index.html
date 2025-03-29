@@ -15,8 +15,6 @@
             display:flex;
             flex-direction: column;
             align-items: center;
-            /* temp */
-            display:none; 
         }
 
         #startBtn{
@@ -27,7 +25,7 @@
         }
 
         #playScreen{
-            display:flex;
+            display:none;
             flex-direction: column;
             align-items: center;
         }
@@ -35,20 +33,21 @@
         #gridContainer{
             display:grid;
             grid-template-columns: repeat(4, 1fr);
-            gap:10px;
+            grid-template-rows: repeat(3, auto); /* Ensure 3 rows appear */
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
         }
 
         .pokeball{
-            width:50px;
-            height:50px;
+            width: 50px;
+            height: 50px;
         }
 
         #overScreen{
-            display:flex;
+            display:none;
             flex-direction: column;
             align-items: center;
-            /* temp */
-            display:none; 
         }
 
         #againBtn{
@@ -63,15 +62,15 @@
 </head>
 <body>
     <!-- start screen -->
-    <div id = startScreen>
+    <div id = "startScreen">
         <h1 id = "title">Memory Matching Madness!</h1>
         <h3 id = "description">Play a fast-paced game of "memory" and try and beat your best time!</h3>
         <button id = "startBtn">Start!</button>
     </div>
 
     <div id = "playScreen">
-        <h1 id = readyMsg>Ready, Set, Match!</h1>
-        <p id = "time">Time: <span id = timeCnt></span></p>
+        <h1 id = "readyMsg" >Ready, Set, Match!</h1>
+        <p id = "time">Time: <span id = timeCnt>0s</span></p>
         <!-- pokemball grid container -->
         <div id = "gridContainer">
 
@@ -79,9 +78,9 @@
     </div>
 
     <div id = "overScreen">
-        <h1 id = overMsg>Game Over!</h1>
-        <p id = "yourTimeP">Your time: <span id = yourTime></span></p>
-        <p id = "bestTimeP">Best time: <span id = bestTime></span></p>
+        <h1 id = "overMsg">Game Over!</h1>
+        <p id = "yourTimeP">Your time: <span id = yourTime>0s</span></p>
+        <p id = "bestTimeP">Best time: <span id = bestTime>0s</span></p>
         <button id = "againBtn">Play Again!</button>
     </div>
 
@@ -104,34 +103,138 @@
         const startBtn = document.getElementById('startBtn');
         const gridContainer = document.getElementById('gridContainer');
         const overScreen = document.getElementById('overScreen');
+        const playScreen = document.getElementById('playScreen');
         const yourTime = document.getElementById('yourTime');
-        const bestTime = document.getElmentById('bestTime');
+        const bestTime = document.getElementById('bestTime');
         const againBtn = document.getElementById('againBtn');
         const timeCnt = document.getElementById('timeCnt');
+        const ball = document.getElementsByClassName('pokeball');
 
-        let tokems = [];
+        //game variables
+        let selectedImages = [];
+        let uncovered = [];
         let matches = 0;
-        let timer;
         let elapsedTime = 0;
+        let timer;
 
         //hide start screen after buttton press
         startBtn.onclick = function(){
             startScreen.style.display = "none";
+            playScreen.style.display = "flex";
+            startGame();
         }
 
-        //create pokeballs
-        for (let i = 0; i < 4; i++){
-            for(let j =0; j <3; j++){
-                let pokeball = document.createElement('img');
-                pokeball.classList.add('pokeball');
-                pokeball.src = 'media/pokeball.png';
+        function reset(){
+            matches = 0;
+            elapsedTime = 0;
+            uncovered = [];
+            selectedImages = [];
+        }
+
+        function startGame(){
+            reset();
+            gridContainer.innerHTML = ""; // Clear the grid
+            startTimer();
+            setupBoard();
+        }
+
+        function setupBoard(){
+            // Select 12 random images
+            while (selectedImages.length < 12) {
+                let randomIndex = Math.floor(Math.random() * assets.length);
+                let image = assets[randomIndex];
+                if (!selectedImages.includes(image)) { // Prevent duplicate pairs
+                    selectedImages.push(image, image); 
+                }
+            }
+
+            selectedImages = shuffle(selectedImages);
+
+            // Create pokeballs
+            gridContainer.innerHTML = "";
+            for (let i = 0; i < 12; i++) {
+                let pokeball = document.createElement("img");
+                pokeball.classList.add("pokeball");
+                pokeball.src = "media/pokeball.png";
+                pokeball.dataset.image = selectedImages[i];
+
+                pokeball.onclick = function () {
+                    reveal(pokeball);
+                };
+
                 gridContainer.appendChild(pokeball);
             }
         }
+        let canClick = true;
 
-        //random 6 pokemon
+        function reveal(pokeball){
+            if (!canClick || uncovered.length >= 2 || uncovered.includes(pokeball)) return;
+            pokeball.src = "media/" + pokeball.dataset.image;
+            uncovered.push(pokeball);
+
+            if (uncovered.length === 2) {
+                canClick = false;
+                setTimeout(checkMatch, 1000);
+            }
+        }
 
 
+        function checkMatch() {
+            if (uncovered[0].dataset.image === uncovered[1].dataset.image) {
+                matches++; // Increase match count
+                uncovered = []; // Clear uncovered array
+            } else {
+                setTimeout(() => {
+                    uncovered[0].src = "media/pokeball.png";
+                    uncovered[1].src = "media/pokeball.png";
+                    uncovered = [];
+                }, 500);
+            }
+            
+            canClick = true; // Allow new clicks
+
+            if (matches === 6) endGame(); // Ends game when all 6 pairs are found
+        }
+
+
+        function startTimer(){
+            clearInterval(timer);
+            timer = setInterval(function () {
+                elapsedTime++;
+                document.getElementById("timeCnt").textContent = elapsedTime + "s";
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(timer);
+            playScreen.style.display = "none";
+            overScreen.style.display = "flex";
+            yourTime.textContent = elapsedTime;
+
+            let best = localStorage.getItem("bestTime");
+            if (!best || elapsedTime < parseInt(best)) {
+                localStorage.setItem("bestTime", elapsedTime);
+                bestTime.textContent = elapsedTime + "- New High Score!";
+            } else {
+                bestTime.textContent = best;
+            }
+        }
+
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                let temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+            return array;
+        }
+
+        againBtn.onclick = function () {
+            overScreen.style.display = "none";
+            startGame();
+        };
 
     </script>
     
