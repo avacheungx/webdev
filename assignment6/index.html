@@ -33,7 +33,7 @@
         #gridContainer{
             display:grid;
             grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(3, auto); /* Ensure 3 rows appear */
+            grid-template-rows: repeat(3, auto);
             gap: 10px;
             justify-content: center;
             align-items: center;
@@ -65,6 +65,14 @@
     <div id = "startScreen">
         <h1 id = "title">Memory Matching Madness!</h1>
         <h3 id = "description">Play a fast-paced game of "memory" and try and beat your best time!</h3>
+        <label for = "difficulty">Choose a Difficulty Level</label>
+        <br>
+        <select name = "difficulty" id = "difficulty">
+            <option value = "easy">Easy: 3 x 4</option>
+            <option value = "medium">Medium: 4 x 5</option>
+            <option value = "hard">Hard: 5 x 6</option>
+        </select>
+        <br>
         <button id = "startBtn">Start!</button>
     </div>
 
@@ -83,7 +91,6 @@
         <p id = "bestTimeP">Best time: <span id = bestTime>0s</span></p>
         <button id = "againBtn">Play Again!</button>
     </div>
-
 
     <script>
         //media array
@@ -109,6 +116,9 @@
         const againBtn = document.getElementById('againBtn');
         const timeCnt = document.getElementById('timeCnt');
         const ball = document.getElementsByClassName('pokeball');
+        const difficulty = document.getElementById('difficulty');
+        const wrong = new Audio('media/wrong.wav');
+        const correct = new Audio('media/correct.wav');
 
         //game variables
         let selectedImages = [];
@@ -133,36 +143,90 @@
 
         function startGame(){
             reset();
-            gridContainer.innerHTML = ""; // Clear the grid
+            gridContainer.innerHTML = "";
             startTimer();
             setupBoard();
         }
 
         function setupBoard(){
-            // Select 12 random images
-            while (selectedImages.length < 12) {
-                let randomIndex = Math.floor(Math.random() * assets.length);
-                let image = assets[randomIndex];
-                if (!selectedImages.includes(image)) { // Prevent duplicate pairs
-                    selectedImages.push(image, image); 
+            //difficulty selection
+            if(difficulty.value === "easy"){
+                while (selectedImages.length < 12) {
+                    let randomIndex = Math.floor(Math.random() * assets.length);
+                    let image = assets[randomIndex];
+                    if (!selectedImages.includes(image)) { 
+                        selectedImages.push(image, image); 
+                    }
                 }
-            }
+                selectedImages = shuffle(selectedImages);
 
-            selectedImages = shuffle(selectedImages);
+                // Create pokeballs
+                gridContainer.innerHTML = "";
+                for (let i = 0; i < 12; i++) {
+                    let pokeball = document.createElement("img");
+                    pokeball.classList.add("pokeball");
+                    pokeball.src = "media/pokeball.png";
+                    pokeball.dataset.image = selectedImages[i];
 
-            // Create pokeballs
-            gridContainer.innerHTML = "";
-            for (let i = 0; i < 12; i++) {
-                let pokeball = document.createElement("img");
-                pokeball.classList.add("pokeball");
-                pokeball.src = "media/pokeball.png";
-                pokeball.dataset.image = selectedImages[i];
+                    pokeball.onclick = function () {
+                        reveal(pokeball);
+                    };
 
-                pokeball.onclick = function () {
-                    reveal(pokeball);
-                };
+                    gridContainer.appendChild(pokeball);
+                }
 
-                gridContainer.appendChild(pokeball);
+            } else if (difficulty.value === "medium"){
+                gridContainer.style.gridTemplateColumns = "repeat(5,1fr)";
+                gridContainer.style.gridTemplateRows = "repeat(4, auto)";
+                while (selectedImages.length < 20) {
+                    let randomIndex = Math.floor(Math.random() * assets.length);
+                    let image = assets[randomIndex];
+                    if (!selectedImages.includes(image)) { 
+                        selectedImages.push(image, image); 
+                    }
+                }
+                selectedImages = shuffle(selectedImages);
+
+                // Create pokeballs
+                gridContainer.innerHTML = "";
+                for (let i = 0; i < 20; i++) {
+                    let pokeball = document.createElement("img");
+                    pokeball.classList.add("pokeball");
+                    pokeball.src = "media/pokeball.png";
+                    pokeball.dataset.image = selectedImages[i];
+
+                    pokeball.onclick = function () {
+                        reveal(pokeball);
+                    };
+
+                    gridContainer.appendChild(pokeball);
+                }
+            } else if (difficulty.value === "hard"){
+                gridContainer.style.gridTemplateColumns = "repeat(6,1fr)";
+                gridContainer.style.gridTemplateRows = "repeat(5, auto)";
+                while (selectedImages.length < 30) {
+                    let randomIndex = Math.floor(Math.random() * assets.length);
+                    let image = assets[randomIndex];
+                    if (!selectedImages.includes(image)) { 
+                        selectedImages.push(image, image); 
+                    }
+                }
+                selectedImages = shuffle(selectedImages);
+
+                // Create pokeballs
+                gridContainer.innerHTML = "";
+                for (let i = 0; i < 30; i++) {
+                    let pokeball = document.createElement("img");
+                    pokeball.classList.add("pokeball");
+                    pokeball.src = "media/pokeball.png";
+                    pokeball.dataset.image = selectedImages[i];
+
+                    pokeball.onclick = function () {
+                        reveal(pokeball);
+                    };
+
+                    gridContainer.appendChild(pokeball);
+                }
             }
         }
         let canClick = true;
@@ -178,23 +242,29 @@
             }
         }
 
-
         function checkMatch() {
-            if (uncovered[0].dataset.image === uncovered[1].dataset.image) {
-                matches++; // Increase match count
-                uncovered = []; // Clear uncovered array
-            } else {
-                setTimeout(() => {
-                    uncovered[0].src = "media/pokeball.png";
-                    uncovered[1].src = "media/pokeball.png";
+            let firstToken = uncovered[0];
+            let secondToken = uncovered[1];
+
+            if (firstToken.dataset.image === secondToken.dataset.image) {
+                matches ++;
+                correct.play();
+                uncovered = [];
+            } else { //add sound
+                wrong.play();
+                setTimeout(function () {
+                    firstToken.src = "media/pokeball.png";
+                    secondToken.src = "media/pokeball.png";
                     uncovered = [];
                 }, 500);
             }
-            
-            canClick = true; // Allow new clicks
+            canClick = true;
 
-            if (matches === 6) endGame(); // Ends game when all 6 pairs are found
+            if (matches === selectedImages.length / 2) {
+                endGame();
+            }
         }
+
 
 
         function startTimer(){
@@ -218,6 +288,33 @@
             } else {
                 bestTime.textContent = best;
             }
+
+            //leaderboard
+            let leaderboardDiv = document.createElement('div');
+            leaderboardDiv.innerHTML = "Leaderboard: <br>";
+
+            let scores = localStorage.getItem("leaderboard");
+            if (!scores) {
+                scores = [];
+            } else {
+                scores = scores.split(",");
+            }
+
+            scores.push(elapsedTime);
+            scores.sort((a, b) => a - b);
+
+            if (scores.length > 3) {
+                scores = scores.slice(0, 3);
+            }
+
+            localStorage.setItem("leaderboard", scores.join(","));
+
+            for (let i = 0; i < scores.length; i++) {
+                leaderboardDiv.innerHTML += (i + 1) + ". " + scores[i] + "s <br>";
+            }
+
+            overScreen.appendChild(leaderboardDiv);
+
         }
 
 
@@ -233,10 +330,10 @@
 
         againBtn.onclick = function () {
             overScreen.style.display = "none";
+            playScreen.style.display = "flex";
             startGame();
         };
 
     </script>
-    
 </body>
 </html>
