@@ -1,12 +1,14 @@
 <?php
+    
     // grab all the incoming data
     $job = $_GET['job'];
     $food = $_GET['food'];
     $activity = $_GET['activity'];
     $fear = $_GET['fear'];
+    $stress = $_GET['stress']; 
 
     // make sure the user filled everything out
-    if ($job == 'empty' || $food == 'empty' || $activity == 'empty' || $fear == 'empty') {
+    if ($job == 'empty' || $food == 'empty' || $activity == 'empty' || $fear == 'empty' || $stress == 'empty') {
         // if not, generate an error message
         header("Location: index.php?error=1");
         exit();
@@ -15,6 +17,7 @@
     $bart = 0;
     $homer = 0;
     $lisa = 0;
+    $marge = 0; 
 
     //job selection
     if ($job == 'bart') {
@@ -25,6 +28,9 @@
     }
     else if ($job == 'lisa') {
         $lisa++;
+    }
+    else if ($job == 'marge') {
+        $marge++;
     }
     else {
         header("Location: index.php?error=invalidcharacter");
@@ -41,6 +47,9 @@
     else if ($food == 'lisa') {
         $lisa++;
     }
+    else if ($food == 'marge') {
+        $marge++;
+    }
     else {
         header("Location: index.php?error=invalidcharacter");
         exit();
@@ -56,6 +65,9 @@
     else if ($activity == 'lisa') {
         $lisa++;
     }
+    else if ($activity == 'marge') {
+        $marge++;
+    }
     else {
         header("Location: index.php?error=invalidcharacter");
         exit();
@@ -70,6 +82,27 @@
     }
     else if ($fear == 'lisa') {
         $lisa++;
+    }
+    else if ($fear == 'marge') {
+        $marge++;
+    }
+    else {
+        header("Location: index.php?error=invalidcharacter");
+        exit();
+    }
+    
+    //stress response selection
+    if ($stress == 'bart') {
+        $bart++;
+    }
+    else if ($stress == 'homer') {
+        $homer++;
+    }
+    else if ($stress == 'lisa') {
+        $lisa++;
+    }
+    else if ($stress == 'marge') {
+        $marge++;
     }
     else {
         header("Location: index.php?error=invalidcharacter");
@@ -87,15 +120,22 @@
 
     // Determine which character got the most points
     $character = "";
-    if ($bart >= $homer && $bart >= $lisa) {
-        // store the name of the character in our text file
+    
+    //find the maximum score
+    $max_score = max($bart, $homer, $lisa, $marge);
+    
+    //determine which character has the maximum score
+    if ($bart == $max_score) {
         $character = "bart";
     }
-    else if ($homer >= $bart && $homer >= $lisa) {
+    else if ($homer == $max_score) {
         $character = "homer";
     }
-    else {
+    else if ($lisa == $max_score) {
         $character = "lisa";
+    }
+    else if ($marge == $max_score) {
+        $character = "marge";
     }
     
     //save the result to the file

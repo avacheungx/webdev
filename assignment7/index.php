@@ -114,6 +114,10 @@
                     $filename = 'Homer.png';
                     $character_name = "Homer Simpson";
                 }
+                else if ($character == 'marge') {
+                    $filename = 'Marge.png';
+                    $character_name = "Marge Simpson";
+                }
         ?>
                 <div class="result">
                     <h2>Your result: <?php echo $character_name; ?>!</h2>
@@ -136,6 +140,7 @@
                     <option value="homer">Working at a bakery</option>
                     <option value="lisa">French tutor</option>
                     <option value="bart">Prank phone call specialist</option>
+                    <option value="marge">Homemaker/House manager</option>
                 </select>
             </div>
 
@@ -146,6 +151,7 @@
                     <option value="bart">Pizza</option>
                     <option value="homer">Donuts</option>
                     <option value="lisa">Apples</option>
+                    <option value="marge">Vegetables</option>
                 </select>
             </div>
 
@@ -156,6 +162,7 @@
                     <option value="bart">Skateboard</option>
                     <option value="homer">Sleep</option>
                     <option value="lisa">Study</option>
+                    <option value="marge">Gardening</option>
                 </select>
             </div>
 
@@ -166,6 +173,18 @@
                     <option value="bart">Flying</option>
                     <option value="homer">Math problems</option>
                     <option value="lisa">Getting anything below an A in school</option>
+                    <option value="marge">Family falling apart</option>
+                </select>
+            </div>
+
+            <div>
+                <p><strong>How do you handle stress?</strong></p>
+                <select id="stress" name="stress">
+                    <option value="empty">Select a response</option>
+                    <option value="bart">Cause trouble to distract yourself</option>
+                    <option value="homer">Eat comfort food</option>
+                    <option value="lisa">Meditate or play saxophone</option>
+                    <option value="marge">Clean the house</option>
                 </select>
             </div>
             <br>
