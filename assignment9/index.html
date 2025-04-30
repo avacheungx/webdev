@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Simple Chatroom</title>
+
+    <!-- load provided styles for the chatroom UI -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- load the helpers.js library, which contains the 'performFetch' function for making fetch requests -->
+    <script src="helpers.js"></script>
+</head>
+
+<body>
+    <!-- header to indicate current chatroom -->
+    <h1 id="chat_header">#chatroom-1</h1>
+
+    <!-- panel to hold username input -->
+    <div id="panel_login" class="hidden">
+        <div class="login-panel">
+            <h2>Enter a username and password to begin chatting.</h2>
+            <p>If you don't have an account this will create one for you.</p>
+            <div id="panel_login_error_missinginfo" class="error-message hidden">Missing information, please try again
+            </div>
+            <div id="panel_login_error_incorrect" class="error-message hidden">Username and/or Password are incorrect
+            </div>
+            <form id="login_form">
+                <input type="text" id="panel_login_username_textbox" placeholder="Your username">
+                <input type="text" id="panel_login_password_textbox" placeholder="Your password">
+                <button id="panel_login_submit_button" type="submit">Join</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- panel to hold chat messages -->
+    <div id="panel_messages"></div>
+
+    <!-- panel containing the form for new chat messages -->
+    <form id="panel_chat_input">
+        <input id="message_input_textbox" type="text" placeholder="Message #chatroom-1">
+        <button id="message_input_submit_button" type="submit">Send</button>
+    </form>
+
+    <!-- main program -->
+    <script>
+        // obtain DOM references to our UI elements
+        const panel_login = document.getElementById('panel_login');
+        const panel_login_username_textbox = document.getElementById('panel_login_username_textbox');
+        const panel_login_submit_button = document.getElementById('panel_login_submit_button');
+        const panel_login_error_missinginfo = document.getElementById('panel_login_error_missinginfo');
+        const panel_login_error_incorrect = document.getElementById('panel_login_error_incorrect');
+
+        const panel_messages = document.getElementById('panel_messages');
+        const message_input_textbox = document.getElementById('message_input_textbox');
+        const message_input_submit_button = document.getElementById('message_input_submit_button');
+
+        // working variables
+        let username;
+        let id = 0;
+        let interactingFlag = false;
+
+        // login button
+        panel_login_submit_button.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            // make sure the user filled out the form
+            if (panel_login_username_textbox.value.length == 0 || panel_login_password_textbox.value.length == 0) {
+                panel_login_error_missinginfo.classList.remove('hidden');
+                panel_login_error_incorrect.classList.add('hidden');
+            }
+
+            // form is filled out, allow them to log in
+            // NOTE: you will need to update this code to handle (1) new users and (2) returning users
+            else {
+                username = panel_login_username_textbox.value;
+                panel_login.style.display = 'none'; /* need to use inline styles here due to display: flex */
+            }
+        });
+
+        // handle mouse over / out events to prevent scrolling while the user is interacting with the chat log
+        panel_messages.onmouseover = function (e) {
+            interactingFlag = true;
+        }
+        panel_messages.onmouseout = function (e) {
+            interactingFlag = false;
+        }
+
+        // function to retrieve previously posted messages
+        async function getMessages() {
+
+            // initiate a fetch request to our API
+            // we will send it the id of the last message we received
+            // when the program starts, the ide variable is set to 0, so this API request 
+            // will retrieve ALL previous messages the first time that it runs
+            performFetch({
+                url: 'api.php?command=getmessages',
+                method: 'post',
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    // convert the received data into a JSON object
+                    let jsonData = JSON.parse(data);
+
+                    // extract the 'id' of the last item in the collection
+                    id = jsonData['id'];
+
+                    // visit each item and create a message element for each one
+                    for (let msg of jsonData.messages) {
+                        // this function is defined below and is used to create new '.message' elements
+                        // refer to the function documentation for more information on how it works
+                        createMessage({
+                            username: msg.username,
+                            message: msg.message,
+                            date: msg.date
+                        });
+                    }
+
+                    // if the user is not currently interacting with the message area we should scroll
+                    // to the bottom to show the most recent message
+                    if (!interactingFlag) {
+                        panel_messages.scrollTop = panel_messages.scrollHeight;
+                    }
+
+                    // call this function again in 1 second to attempt to get new data
+                    setTimeout(getMessages, 1000);
+                },
+
+                // if an error occurs we should try this operation again in 1 second
+                error: function (error) {
+                    console.log("ERROR:", error);
+                    setTimeout(getMessages, 1000);
+                }
+            });
+        }
+
+        // attempt to get messages 1 time when the page loads
+        getMessages();
+
+
+        // when the user clicks the submit button to post a new message
+        message_input_submit_button.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            // make sure the user filled out the message input box
+            if (message_input_textbox.value.length == 0) {
+                return;
+            }
+
+            // disable the text box so the user can't modify it while the request 
+            // to save the message is being processed by the server
+            message_input_textbox.disabled = true;
+
+            // contact the server with our username and message
+            performFetch({
+                url: 'api.php?command=savemessage',
+                method: 'post',
+                data: {
+                    username: username,
+                    message: message_input_textbox.value
+                },
+
+                // upon success (or error), unlock the text box and clear it for the next message
+                success: function (data) {
+                    console.log(data);
+                    message_input_textbox.disabled = false;
+                    message_input_textbox.value = '';
+                },
+                error: function (error) {
+                    console.log("ERROR:", error);
+                    message_input_textbox.disabled = false;
+                    message_input_textbox.value = '';
+                }
+            })
+        });
+
+
+        // function: createMessage
+        // this function will create new message elements and add them to the #panel_messages panel
+        /* USAGE:
+
+            createMessage({
+                username: string,
+                message: string,
+                privateMessage: true|false, // optional
+                date: string // optional
+            })
+        */
+        function createMessage(args) {
+            /*
+            <div class="message private-message">
+                <div class="message-header">
+                    <div class="username">user1</div>
+                    <span class="timestamp">April 16th, 2025</span>
+                </div>
+                <div class="text">Hey there!</div>
+            </div>
+            */
+
+            // create a container element for this message
+            const div = document.createElement('div');
+            div.classList.add('message');
+
+            // determine if this is a private message -- if so, add the appropriate class
+            if (args.privateMessage) {
+                div.classList.add('private-message');
+            }
+
+            // message header element (username and optional timestamp container)
+            const divHeader = document.createElement('div');
+            divHeader.classList.add('message-header');
+            div.appendChild(divHeader);
+
+            // username element
+            const divUsername = document.createElement('span');
+            divUsername.classList.add('username');
+            divUsername.innerText = args.username;
+            divHeader.appendChild(divUsername);
+
+            // date element (optional)
+            if (args.date) {
+                const divTimestamp = document.createElement('span');
+                divTimestamp.classList.add('timestamp');
+                divTimestamp.innerText = args.date;
+                divHeader.appendChild(divTimestamp);
+            }
+
+            // message text element
+            const divText = document.createElement('div');
+            divText.classList.add('text');
+            divText.innerText = args.message;
+            div.appendChild(divText);
+
+            // add to message panel
+            panel_messages.appendChild(div);
+        }        
+
+    </script>
+</body>
+
+</html>

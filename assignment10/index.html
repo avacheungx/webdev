@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>To Do List with Vue</title>
+
+    <!-- Provided stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Load in the Vue library -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- Load in our helpers library, which lets us make fetch requests -->
+    <script src="helpers.js"></script>
+</head>
+
+<body>
+
+    <h1>To Do List with Vue</h1>
+
+    <!-- The root element for our Vue app-->
+    <div id="app">
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button class="primary">Add Item</button>
+            <button class="primary">Save To-Do List</button>
+        </div>
+
+
+        <!-- Panel: Add New Item -->
+        <div class="panel" id="panelAddItem">
+            <button class="close-button light">✕</button>
+            <h2>Add New Item</h2>
+
+            <div class="error-message">
+                Please fill out the form fully.
+            </div>
+
+            <div class="form-row">
+                <label for="itemTitle">Title</label>
+                <input type="text" id="itemTitle">
+            </div>
+            <div class="form-row">
+                <label for="itemDescription">Description</label>
+                <textarea id="itemDescription" rows="3"></textarea>
+            </div>
+            <div class="form-row">
+                <label for="itemCategory">Category</label>
+                <select id="itemCategory">
+
+                    <!-- Sample category, replace with your own dynamically -->
+                    <option value="Sample">Sample</option>
+
+                </select>
+            </div>
+            <button class="secondary">Save Item</button>
+        </div>
+
+
+
+        <!-- Panel: Edit Existing Item -->
+        <div class="panel" id="panelEditItem">
+            <button class="close-button light">✕</button>
+            <h2>Edit Item</h2>
+
+            <div class="error-message">
+                Please fill out the form fully.
+            </div>
+
+            <div class="form-row">
+                <label for="editTitle">Title</label>
+                <input type="text" id="editTitle">
+            </div>
+            <div class="form-row">
+                <label for="editDescription">Description</label>
+                <textarea id="editDescription" rows="3"></textarea>
+            </div>
+            <div class="form-row">
+                <label for="editCategory">Category</label>
+                <select id="editCategory">
+
+                    <!-- Sample category, replace with your own dynamically -->
+                    <option value="Sample">Sample</option>
+
+                </select>
+            </div>
+            <button class="secondary">Update Item</button>
+        </div>
+
+
+        <!-- Panel for Existing To-Do Items -->
+        <div class="todo-grid" id="panelExistingToDoItems">
+
+            <!-- Sample to-do list item, replace with your own dynamically -->
+            <div class="todo-card">
+                <span class="category-tag">Uncategorized</span>
+                <h3>File Taxes</h3>
+                <p>Complete and file 2025 taxes.</p>
+
+                <div class="card-actions">
+                    <button class="light">Edit</button>
+                    <button class="light">
+                        <span>Mark as Active</span>
+                        <span>Mark as Complete</span>
+                    </button>
+                    <button class="light">Delete</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Your application code -->
+    <script>
+        
+
+    </script>
+
+</body>
+
+</html>

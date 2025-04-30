@@ -17,7 +17,7 @@
     }
 
     // connect to our database
-    $db = new SQLite3('databases/movies.db');
+    $db = new SQLite3('/home/ahc9434/databases/movies.db');
 
     // construct a query to insert the new movie
     $sql = "INSERT INTO movies (title, year) VALUES (:title, :year)";

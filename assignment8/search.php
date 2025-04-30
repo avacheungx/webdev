@@ -10,7 +10,7 @@ $searchResults = [];
 
 if ($searchPerformed) {
     //connect to the database
-    $db = new SQLite3('databases/movies.db');
+    $db = new SQLite3('/home/ahc9434/databases/movies.db');
 
     //build the SQL query 
     $sql = "SELECT id, title, year FROM movies WHERE 1=1";

@@ -9,7 +9,7 @@
     }
 
     // connect to our database
-    $db = new SQLite3('databases/movies.db');
+    $db = new SQLite3('/home/ahc9434/databases/movies.db');
 
     // construct a query to delete the movie
     $sql = "DELETE FROM movies WHERE id = :id";
