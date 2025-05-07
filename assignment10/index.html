@@ -24,88 +24,82 @@
 
         <!-- Toolbar -->
         <div class="toolbar">
-            <button class="primary">Add Item</button>
-            <button class="primary">Save To-Do List</button>
+            <button class="primary" @click="showAdd">Add Item</button>
+            <button class="primary" @click="saveList">Save To-Do List</button>
         </div>
 
 
         <!-- Panel: Add New Item -->
-        <div class="panel" id="panelAddItem">
-            <button class="close-button light">✕</button>
+        <div class="panel" id="panelAddItem" v-if="addVisibility">
+            <button class="close-button light" @click="hideAdd">✕</button>
             <h2>Add New Item</h2>
 
-            <div class="error-message">
+            <div class="error-message" v-if="showAddError">
                 Please fill out the form fully.
             </div>
 
             <div class="form-row">
                 <label for="itemTitle">Title</label>
-                <input type="text" id="itemTitle">
+                <input type="text" id="itemTitle" v-model="newTitle">
             </div>
             <div class="form-row">
                 <label for="itemDescription">Description</label>
-                <textarea id="itemDescription" rows="3"></textarea>
+                <textarea id="itemDescription" rows="3" v-model="newDescription"></textarea>
             </div>
             <div class="form-row">
                 <label for="itemCategory">Category</label>
-                <select id="itemCategory">
-
-                    <!-- Sample category, replace with your own dynamically -->
-                    <option value="Sample">Sample</option>
-
+                <select id="itemCategory" v-model="newCategory">
+                    <option v-for="(color, categoryName) in categories" :value="categoryName">{{ categoryName }}</option>
                 </select>
             </div>
-            <button class="secondary">Save Item</button>
+            <button class="secondary" @click="saveItem">Save Item</button>
         </div>
 
 
 
         <!-- Panel: Edit Existing Item -->
-        <div class="panel" id="panelEditItem">
-            <button class="close-button light">✕</button>
+        <div class="panel" id="panelEditItem" v-if="editVisibility">
+            <button class="close-button light" @click="hideEdit">✕</button>
             <h2>Edit Item</h2>
 
-            <div class="error-message">
+            <div class="error-message" v-if="showEditError">
                 Please fill out the form fully.
             </div>
 
             <div class="form-row">
                 <label for="editTitle">Title</label>
-                <input type="text" id="editTitle">
+                <input type="text" id="editTitle" v-model="editTitle">
             </div>
             <div class="form-row">
                 <label for="editDescription">Description</label>
-                <textarea id="editDescription" rows="3"></textarea>
+                <textarea id="editDescription" rows="3" v-model="editDescription"></textarea>
             </div>
             <div class="form-row">
                 <label for="editCategory">Category</label>
-                <select id="editCategory">
-
-                    <!-- Sample category, replace with your own dynamically -->
-                    <option value="Sample">Sample</option>
-
+                <select id="editCategory" v-model="editCategory">
+                    <option v-for="(color, categoryName) in categories" :value="categoryName">{{ categoryName }}</option>
                 </select>
             </div>
-            <button class="secondary">Update Item</button>
+            <button class="secondary" @click="updateItem">Update Item</button>
         </div>
 
 
         <!-- Panel for Existing To-Do Items -->
-        <div class="todo-grid" id="panelExistingToDoItems">
+        <div class="todo-grid" id="panelExistingToDoItems" v-if="!addVisibility && !editVisibility">
 
-            <!-- Sample to-do list item, replace with your own dynamically -->
-            <div class="todo-card">
-                <span class="category-tag">Uncategorized</span>
-                <h3>File Taxes</h3>
-                <p>Complete and file 2025 taxes.</p>
+            <!-- Dynamic to-do list items -->
+            <div class="todo-card" v-for="(item, index) in items" :key="item.id" :class="{ complete: item.complete }">
+                <span class="category-tag" :style="{ backgroundColor: categories[item.category] }">{{ item.category }}</span>
+                <h3>{{ item.title }}</h3>
+                <p>{{ item.description }}</p>
 
                 <div class="card-actions">
-                    <button class="light">Edit</button>
-                    <button class="light">
-                        <span>Mark as Active</span>
-                        <span>Mark as Complete</span>
+                    <button class="light" @click="editItem(item)" v-if="!item.complete">Edit</button>
+                    <button class="light" @click="toggleComplete(index)">
+                        <span v-if="!item.complete">Mark as Complete</span>
+                        <span v-if="item.complete">Mark as Active</span>
                     </button>
-                    <button class="light">Delete</button>
+                    <button class="light" @click="deleteItem(index)">Delete</button>
                 </div>
             </div>
 
@@ -116,8 +110,172 @@
 
     <!-- Your application code -->
     <script>
-        
+        // create vue instance
+        Vue.createApp({
+            data: function(){
+                return{
+                    addVisibility: false,
+                    editVisibility: false,
+                    categories: {
+                        'Uncategorized': 'grey',
+                        'Personal': 'blue',
+                        'Work': 'orange'
+                    },
+                    //new items
+                    newTitle: '',
+                    newDescription: '',
+                    newCategory: 'Uncategorized',
+                    showAddError: false,
+                    
+                    //modified items
+                    editTitle: '',
+                    editDescription: '',
+                    editCategory: 'Uncategorized',
+                    showEditError: false,
+                    currentEditIndex: -1,
+                    
+                    items: []
+                }
+            },
 
+            methods: {
+                showAdd() {
+                    this.addVisibility = true;
+                    this.resetNew();
+                },
+                hideAdd() {
+                    this.addVisibility = false;
+                },
+                showEdit() {
+                    this.editVisibility = true;
+                },
+                hideEdit() {
+                    this.editVisibility = false;
+                },
+                
+                resetNew() {
+                    this.newTitle = '';
+                    this.newDescription = '';
+                    this.newCategory = 'Uncategorized';
+                    this.showAddError = false;
+                },
+                resetEdit() {
+                    this.editTitle = '';
+                    this.editDescription = '';
+                    this.editCategory = 'Uncategorized';
+                    this.showEditError = false;
+                    this.currentEditIndex = -1;
+                },
+                saveItem() {
+                    //validate inputs
+                    if (!this.newTitle.trim() || !this.newDescription.trim()) {
+                        this.showAddError = true;
+                        return;
+                    }
+                    
+                    //make new item
+                    const newItem = {
+                        id: crypto.randomUUID(),
+                        title: this.newTitle,
+                        description: this.newDescription,
+                        category: this.newCategory,
+                        complete: false
+                    };
+                    
+                    this.items.push(newItem);
+                    
+                    //hide panel and reset
+                    this.hideAdd();
+                    this.resetNew();
+                },
+                
+                deleteItem(index) {
+                    this.items.splice(index, 1);
+                },
+                
+                toggleComplete(index) {
+                    this.items[index].complete = !this.items[index].complete;
+                },
+                
+                editItem(item) {
+                    const index = this.items.findIndex(i => i.id === item.id);
+                    if (index !== -1) {
+                        //store index
+                        this.currentEditIndex = index;
+                        
+                        //copy data
+                        this.editTitle = item.title;
+                        this.editDescription = item.description;
+                        this.editCategory = item.category;
+                        
+                        this.editVisibility = true;
+                    }
+                },
+                
+                updateItem() {
+                    //validate inputs
+                    if (!this.editTitle.trim() || !this.editDescription.trim()) {
+                        this.showEditError = true;
+                        return;
+                    }
+                    
+                    if (this.currentEditIndex >= 0) {
+                        //update items
+                        this.items[this.currentEditIndex].title = this.editTitle;
+                        this.items[this.currentEditIndex].description = this.editDescription;
+                        this.items[this.currentEditIndex].category = this.editCategory;
+                        
+                        //hide panel and reset
+                        this.hideEdit();
+                        this.resetEdit();
+                    }
+                },
+                
+                saveList() {
+                    const data = {
+                        items: this.items
+                    };
+                    
+                    performFetch({
+                        url: 'save_todo_list.php',
+                        method: 'POST',
+                        data: { todoData: JSON.stringify(data) },
+                        success: (response) => {
+                            console.log('Todo list saved successfully!', response);
+                            alert('Todo list saved successfully!');
+                        },
+                        error: (err) => {
+                            console.error('Error saving todo list:', err);
+                            alert('Error saving todo list. Please try again.');
+                        }
+                    });
+                },
+                
+                loadList() {
+                    performFetch({
+                        url: 'get_todo_list.php',
+                        method: 'GET',
+                        success: (data) => {
+                            const parsedData = JSON.parse(data); //PARSE DATATTATATATATA
+                            if (parsedData && parsedData.items) {
+                                this.items = parsedData.items;
+                                console.log('loaded successfully');
+                            }
+                        },
+                        error: (err) => {
+                            console.error('error loading list:', err);
+                            this.items = [];
+                        }
+                    });
+                }
+            },
+            
+            mounted: function() {
+                
+                this.loadList();
+                console.log('AHHHHHHHHHHHHHHHHHHHHHLOAD PLEASE');
+            }
+        }).mount('#app');
     </script>
 
 </body>
