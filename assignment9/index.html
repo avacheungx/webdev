@@ -71,10 +71,32 @@
 
             // form is filled out, allow them to log in
             // NOTE: you will need to update this code to handle (1) new users and (2) returning users
-            else {
-                username = panel_login_username_textbox.value;
-                panel_login.style.display = 'none'; /* need to use inline styles here due to display: flex */
-            }
+            performFetch({
+                url: 'api.php?command=authenticate',
+                method: 'post',
+                data: {
+                    username: panel_login_username_textbox.value,
+                    password: panel_login_password_textbox.value
+                },
+                success: function (response) {
+                    if (response === "success") {
+                        //successful authentication
+                        username = panel_login_username_textbox.value;
+                        panel_login.style.display = 'none'; /* need to use inline styles here due to display: flex */
+                        panel_login_error_missinginfo.classList.add('hidden');
+                        panel_login_error_incorrect.classList.add('hidden');
+                    } else if (response === "incorrect") {
+                        //username exists -> passowrd is wrong
+                        panel_login_error_incorrect.classList.remove('hidden');
+                        panel_login_error_missinginfo.classList.add('hidden');
+                    } else {
+                        console.error("Authentication error:", response);
+                    }
+                },
+                error: function (error) {
+                    console.error("ERROR:", error);
+                }
+            });
         });
 
         // handle mouse over / out events to prevent scrolling while the user is interacting with the chat log

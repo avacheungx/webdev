@@ -6,8 +6,15 @@
     }
 
     // connect to our database
-    $path = '/home/databases';
+    $path = __DIR__ . '/databases'; //pathing sucks
     $db = new SQLite3($path.'/chat.db');
+
+    //create the user tbale if it doesnt exist (IT SHOULDDDDD ALREADY BUT YK)
+    $db->exec('CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        password TEXT
+    )');
 
     // API call to save a message to the 'messages' table
     // requirements:
@@ -73,11 +80,51 @@
         // encode the object as a JSON string and send it to the client
         print json_encode($send_back);
     }
-
-
-    // invalid command
-    else {
-        print "error";
+    // API call to authenticate a user or create a new account
+    // requirements:
+    //                  command = "authenticate"
+    //                  $_POST['username'] (string)
+    //                  $_POST['password'] (string)
+    else if ($_GET['command'] == 'authenticate' && isset($_POST['username']) && isset($_POST['password'])) {
+        //check is user exists
+        $sql = "SELECT COUNT(*) FROM users WHERE username = :username";
+        $statement = $db->prepare($sql);
+        $statement->bindValue(':username', $_POST['username']);
+        $result = $statement->execute();
+        $count = $result->fetchArray()[0];
+    
+        //user exists -> verify password
+        if ($count > 0) {
+            $sql = "SELECT COUNT(*) FROM users WHERE username = :username AND password = :password";
+            $statement = $db->prepare($sql);
+            $statement->bindValue(':username', $_POST['username']);
+            $statement->bindValue(':password', $_POST['password']);
+            $result = $statement->execute();
+            $match = $result->fetchArray()[0];
+    
+            if ($match > 0) {
+                //password matches
+                print "success";
+            } else {
+                //no matchy
+                print "incorrect";
+            }
+        } 
+        //user dont exist -> create accouunt
+        else {
+            $sql = "INSERT INTO users (username, password) VALUES (:username, :password)";
+            $statement = $db->prepare($sql);
+            $statement->bindValue(':username', $_POST['username']);
+            $statement->bindValue(':password', $_POST['password']);
+            $result = $statement->execute();
+            $id = $db->lastInsertRowID();
+    
+            if ($id) {
+                print "success";
+            } else {
+                print "error";
+            }
+        }
     }
 
     // close the database and release it for the next request
