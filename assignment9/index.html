@@ -173,6 +173,69 @@
             // to save the message is being processed by the server
             message_input_textbox.disabled = true;
 
+            //check if message starts with /
+            if (message_input_textbox.value.startsWith('/')) {
+                //handle the command
+                const commandText = message_input_textbox.value;
+                
+                //extract command
+                const command = commandText.includes(' ') ? 
+                                commandText.substring(0, commandText.indexOf(' ')).toLowerCase() : 
+                                commandText.toLowerCase();
+                
+                //commands
+                switch(command) {
+                    case '/help':
+                        //display help message
+                        createMessage({
+                            username: '(private) SYSTEM MESSAGE',
+                            privateMessage: true,
+                            message: 'Valid commands:\n  /help - (private) displays this help message.'
+                            //implement the rest later
+                        });
+                        break;
+                    case '/roll':
+                        createMessage({
+                            username: 'SYSTEM MESSAGE',
+                            privateMessage: false,
+                            message: 'help - (private) displays this help message.'
+                        });
+                        break;
+                    case '/rollhistory NUMBER':
+                        break;
+                    case '/coinflip':
+                        break;
+                    case '/coinfliphistory NUMBER':
+                        break;
+                    case '/magic8ball QUESTION':
+                        break;
+                    case '/quote':
+                        break;
+                    case '/piratetext MESSAGE':
+                        break;
+                    case '/define WORD':
+                        break;
+                    default:
+                        //unrecognized command
+                        createMessage({
+                            username: '(private) SYSTEM MESSAGE',
+                            privateMessage: true,
+                            message: `Unrecognized command: ${command}`
+                        });
+                        break;
+                }
+                
+                //clear the input box after processing the command
+                message_input_textbox.disabled = false;
+                message_input_textbox.value = '';
+                return;
+            }
+
+            //regular message
+            // disable the text box so the user can't modify it while the request 
+            // to save the message is being processed by the server
+            message_input_textbox.disabled = true;
+
             // contact the server with our username and message
             performFetch({
                 url: 'api.php?command=savemessage',
@@ -193,21 +256,9 @@
                     message_input_textbox.disabled = false;
                     message_input_textbox.value = '';
                 }
-            })
+            });
         });
 
-
-        // function: createMessage
-        // this function will create new message elements and add them to the #panel_messages panel
-        /* USAGE:
-
-            createMessage({
-                username: string,
-                message: string,
-                privateMessage: true|false, // optional
-                date: string // optional
-            })
-        */
         function createMessage(args) {
             /*
             <div class="message private-message">
