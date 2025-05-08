@@ -16,6 +16,14 @@
         password TEXT
     )');
 
+    // create the coinflips table if it doesn't exist meow meow meow meow meow
+    $db->exec('CREATE TABLE IF NOT EXISTS coinflips (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        result TEXT,
+        date DATETIME DEFAULT CURRENT_TIMESTAMP
+    )');
+
     // API call to save a message to the 'messages' table
     // requirements:
     //                  command = "savemessage"
@@ -125,6 +133,68 @@
                 print "error";
             }
         }
+    }
+    // API call to flip a coin and save it to the database
+    // requirements:
+    //                  command = "coinflip"
+    //                  $_POST['username'] (string)
+    if ($_GET['command'] == 'coinflip' && isset($_POST['username'])) {
+        //random coin flip
+        $result = (rand(0, 1) == 0) ? 'Heads' : 'Tails';
+        
+        //save the coin flip to the database
+        $sql = "INSERT INTO coinflips (username, result) VALUES (:username, :result)";
+        $statement = $db->prepare($sql);
+        $statement->bindValue(':username', $_POST['username']);
+        $statement->bindValue(':result', $result);
+        $statement->execute();
+        
+        $message = $_POST['username'] . " flipped a coin - " . $result . "!";
+        
+        //save message
+        $sql = "INSERT INTO messages (username, message) VALUES ('SYSTEM MESSAGE', :message)";
+        $statement = $db->prepare($sql);
+        $statement->bindValue(':message', $message);
+        $statement->execute();
+        
+        //return result
+        $response = [];
+        $response['result'] = $result;
+        print json_encode($response);
+    }
+    
+    // API call to get coin flip history
+    // requirements:
+    //                  command = "coinfliphistory"
+    //                  $_POST['limit'] (integer) - optional, defaults to 10
+    else if ($_GET['command'] == 'coinfliphistory' && isset($_POST['username'])) {
+        //get parameter, else last 10
+        $limit = isset($_POST['limit']) ? (int)$_POST['limit'] : 10;
+        
+        //get history from database
+        $sql = "SELECT result FROM coinflips ORDER BY id DESC LIMIT :limit";
+        $statement = $db->prepare($sql);
+        $statement->bindValue(':limit', $limit, SQLITE3_INTEGER);
+        $result = $statement->execute();
+        
+        $heads = 0;
+        $tails = 0;
+        
+        while ($row = $result->fetchArray()) {
+            if ($row['result'] == 'Heads') {
+                $heads++;
+            } else {
+                $tails++;
+            }
+        }
+        
+        $message = $_POST['username'] . " requested the coin flip history for the last " . $limit . " flips:\nHeads: " . $heads . "\nTails: " . $tails;
+        
+        //save mesage
+        $sql = "INSERT INTO messages (username, message) VALUES ('SYSTEM MESSAGE', :message)";
+        $statement = $db->prepare($sql);
+        $statement->bindValue(':message', $message);
+        $statement->execute();
     }
 
     // close the database and release it for the next request

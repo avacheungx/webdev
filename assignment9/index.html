@@ -159,6 +159,22 @@
         // attempt to get messages 1 time when the page loads
         getMessages();
 
+        //quotes function
+        let quotesData = [];
+        function loadQuotes() {
+            fetch('datasets/Database-Quotes-JSON/quotes.json')
+                .then(response => response.json())
+                .then(data => {
+                    quotesData = data;
+                    console.log('Quotes loaded successfully');
+                })
+                .catch(error => {
+                    console.error('Error loading quotes:', error);
+                });
+        }
+        loadQuotes();
+
+
 
         // when the user clicks the submit button to post a new message
         message_input_submit_button.addEventListener('click', function (event) {
@@ -190,30 +206,94 @@
                         createMessage({
                             username: '(private) SYSTEM MESSAGE',
                             privateMessage: true,
-                            message: 'Valid commands:\n  /help - (private) displays this help message.'
-                            //implement the rest later
+                            message: 'Valid commands:\n  /help - (private) displays this help message' +
+                            ' \n /coinflip - (public) flips a coin and reports heads or tails' + 
+                            '\n /coinfliphistory NUMBER - (public) displays a summary chart of NUMBER previous coin flips. displays a summary of the last 10 coin flips if NUMBER is not provided' +
+                            '\n /quote - (public) displays a random quote'
                         });
-                        break;
-                    case '/roll':
-                        createMessage({
-                            username: 'SYSTEM MESSAGE',
-                            privateMessage: false,
-                            message: 'help - (private) displays this help message.'
-                        });
-                        break;
-                    case '/rollhistory NUMBER':
                         break;
                     case '/coinflip':
+                        performFetch({
+                            url: 'api.php?command=coinflip',
+                            method: 'post',
+                            data: {
+                                username: username
+                            },
+                            success: function (data) {
+                                console.log('coin flip completed');
+                            },
+                            error: function (error) {
+                                console.log('ERROR with coin flip:', error);
+                            }
+                        });
                         break;
-                    case '/coinfliphistory NUMBER':
-                        break;
-                    case '/magic8ball QUESTION':
+                    case '/coinfliphistory': 
+                        //check if argument is provided 
+                        let args = '';
+                        if (commandText.includes(' ')) {
+                            args = commandText.substring(commandText.indexOf(' ') + 1);
+                        }
+                        let limit = 10; // Default limit
+                        
+                        if (args.trim() !== '') {
+                            //parse the argument as an integer
+                            const parsedLimit = parseInt(args.trim(), 10);
+                            
+                            if (isNaN(parsedLimit) || parsedLimit <= 0) {
+                                //invalid input
+                                createMessage({
+                                    username: '(private) SYSTEM MESSAGE',
+                                    privateMessage: true,
+                                    message: 'Number of coin flips must be an integer'
+                                });
+                                message_input_textbox.value = '';
+                                return;
+                            }
+                            
+                            limit = parsedLimit;
+                        }
+                        
+                        //get coin history
+                        performFetch({
+                            url: 'api.php?command=coinfliphistory',
+                            method: 'post',
+                            data: {
+                                username: username,
+                                limit: limit
+                            },
+                            success: function (data) {
+                                console.log('Coin flip history requested');
+                            },
+                            error: function (error) {
+                                console.log('ERROR with coin flip history:', error);
+                            }
+                        });
                         break;
                     case '/quote':
-                        break;
-                    case '/piratetext MESSAGE':
-                        break;
-                    case '/define WORD':
+                        //display a random quote
+                        if (quotesData.length > 0) {
+                            const randomIndex = Math.floor(Math.random() * quotesData.length);
+                            const quote = quotesData[randomIndex];
+                            
+                            //format the quote message 
+                            const quoteMessage = `${username} requested a random quote!\n\n${quote.quoteText}\n-${quote.quoteAuthor}`;
+                            
+                            //sent quote to serveer
+                            performFetch({
+                                url: 'api.php?command=savemessage',
+                                method: 'post',
+                                data: {
+                                    username: 'SYSTEM MESSAGE',
+                                    message: quoteMessage
+                                },
+                                success: function (data) {
+                                    console.log('Quote message sent:', data);
+                                },
+                                error: function (error) {
+                                    console.log('ERROR sending quote:', error);
+                                }
+                            });
+                        } 
                         break;
                     default:
                         //unrecognized command
